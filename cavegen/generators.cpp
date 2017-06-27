@@ -27,6 +27,7 @@ void CellAutomataGenerator::renderGUI(Game* game)
 	ImGui::InputFloat("Initial wall probability [0..1]", &config.wallProbability, SPINNER_DELTA, FAST_SPINNER_DELTA);
 	ImGui::InputInt("Neighbouring walls required for next iteration", &config.minSurroundingWallsForNextIter);
 	ImGui::Checkbox("Count current cell?", &config.includeSelf);
+	ImGui::Checkbox("Simulate borders?", &config.useCorners);
 }
 
 void CellAutomataGenerator::noise(Map* map)
@@ -36,18 +37,35 @@ void CellAutomataGenerator::noise(Map* map)
 	std::default_random_engine engine(r());
 	std::uniform_real_distribution<float> dist(0, 1);
 
-	for (int i = 0; i < numCells; ++i)
+	for (int i = 0; i < map->rows; ++i)
 	{
-		(*map)[i] = dist(engine) <= config.wallProbability ? CellType::Wall : CellType::Empty;
+		for (int j = 0; j < map->cols; ++j)
+		{
+			bool corner = j == 0 || j == map->cols - 1 || i == 0 || i == map->rows - 1;
+			if (!config.useCorners && corner)
+			{
+				(*map)(i, j) = CellType::Wall;
+			}
+			else
+			{
+				(*map)(i, j) = dist(engine) <= config.wallProbability ? CellType::Wall : CellType::Empty;
+			}			
+		}
 	}
+	
 }
 
 void CellAutomataGenerator::step(Map* map)
 {
 	std::vector<CellType> copy(map->cells);
-	for (int i = 0; i < map->rows; ++i)
+	int startRow = config.useCorners ? 0 : 1;
+	int endRow = config.useCorners ? map->rows : map->rows - 1;
+	int startCol = config.useCorners ? 0 : 1;
+	int endCol = config.useCorners ? map->cols : map->cols - 1;
+	
+	for (int i = startRow; i < endRow; ++i)
 	{
-		for (int j = 0; j < map->cols; ++j)
+		for (int j = startCol; j < endCol; ++j)
 		{
 			(*map)(i, j) = config.checkFunction(i, j, map, copy) ? CellType::Wall : CellType::Empty;
 		}

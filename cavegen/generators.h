@@ -24,6 +24,7 @@ struct CellAutomataConfig
 {
 	bool useSeed = false;
 	unsigned int seed = 0;
+	bool useCorners = false;
 	float wallProbability = 0.45f;
 	int minSurroundingWallsForNextIter = 5;
 	bool includeSelf = true;
