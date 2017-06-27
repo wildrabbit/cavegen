@@ -31,5 +31,7 @@
 *.out
 *.app
 Release/
+cavegen/Release/
 Debug/
+cavegen/Debug/
 .vs/
