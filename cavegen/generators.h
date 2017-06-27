@@ -28,6 +28,7 @@ struct CellAutomataConfig
 	float wallProbability = 0.45f;
 	int minSurroundingWallsForNextIter = 5;
 	bool includeSelf = true;
+	int functionIndex = 0;
 	CellEvaluationFunction checkFunction = nullptr;
 };
 
@@ -40,6 +41,7 @@ private:
 	void noise(Map* map);
 	void step(Map* map);
 	bool basicEvaluation(int i, int j, const Map* map, const Map::CellArray& oldCells);
+	bool basicEvaluationClosed(int i, int j, const Map* map, const Map::CellArray& oldCells);
 	int countNeighbourhood(int i, int j, const Map* map, const Map::CellArray& oldCells, int distance, bool countSelf);
 public:
 	CellAutomataGenerator() {}

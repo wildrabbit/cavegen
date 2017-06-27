@@ -3,6 +3,8 @@
 #include "imgui.h"
 #include "imgui-sfml/imgui-sfml.h"
 
+#define ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
+
 void CellAutomataGenerator::init(const CellAutomataConfig& _config)
 {
 	config = _config;
@@ -28,6 +30,13 @@ void CellAutomataGenerator::renderGUI(Game* game)
 	ImGui::InputInt("Neighbouring walls required for next iteration", &config.minSurroundingWallsForNextIter);
 	ImGui::Checkbox("Count current cell?", &config.includeSelf);
 	ImGui::Checkbox("Simulate borders?", &config.useCorners);
+	const char* options[] = { "Basic", "Extended" };
+	if (ImGui::Combo("Algorithm", &config.functionIndex, options, ARRAYSIZE(options)))
+	{
+		config.checkFunction = (config.functionIndex == 0) 
+			? std::bind(&CellAutomataGenerator::basicEvaluation, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)
+			: std::bind(&CellAutomataGenerator::basicEvaluationClosed, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	}
 }
 
 void CellAutomataGenerator::noise(Map* map)
@@ -78,13 +87,21 @@ bool CellAutomataGenerator::basicEvaluation(int i, int j, const Map* map, const 
 	return numWalls >= config.minSurroundingWallsForNextIter;
 }
 
+bool CellAutomataGenerator::basicEvaluationClosed(int i, int j, const Map* map, const Map::CellArray& oldCells)
+{
+	bool basic = basicEvaluation(i, j, map, oldCells);
+	int numWalls = countNeighbourhood(i, j, map, oldCells, 2, config.includeSelf);
+	return basic || numWalls <= 1;
+}
+
 int CellAutomataGenerator::countNeighbourhood(int i, int j, const Map* map, const Map::CellArray& oldCells, int distance, bool countSelf)
 {
 	int numWalls = 0;
-	for (int deltaRow = -1; deltaRow <= 1; ++deltaRow)
+	for (int deltaRow = -distance; deltaRow <= distance; ++deltaRow)
 	{
-		for (int deltaCol = -1; deltaCol <= 1; ++deltaCol)
+		for (int deltaCol = -distance; deltaCol <= distance; ++deltaCol)
 		{
+			if (distance == 2 && (abs(i - deltaRow) == 2 && abs(j - deltaCol) == 2)) continue;
 			if (!map->validCoords(i + deltaRow, j + deltaCol)) continue;
 			if (deltaRow == 0 && deltaCol == 0 && !countSelf) continue;
 			if (oldCells[map->asIndex(i + deltaRow, j + deltaCol)] == CellType::Wall)

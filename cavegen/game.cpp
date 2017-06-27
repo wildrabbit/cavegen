@@ -77,7 +77,8 @@ void Game::drawGUI()
 			playing = true;
 			itersLeft = simulationConfig.numIters;
 			nextIterTime = simulationConfig.stepDelay;
-		}
+			ImGui::SetWindowCollapsed(true);
+		}		
 	}
 	if (!simulationConfig.autoStep && ImGui::Button("Simulation step"))
 	{
