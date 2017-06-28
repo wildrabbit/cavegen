@@ -1,11 +1,13 @@
 #pragma once
 #include <functional>
+#include <random>
 #include "map.h"
 class Game;
 
 enum class GeneratorType : int
 {
-	CellAutomata = 0
+	CellAutomata = 0,
+	DrunkardWalk = 1
 };
 
 class IGenerator
@@ -13,6 +15,7 @@ class IGenerator
 public:
 	virtual void start(Map* map) = 0;
 	virtual void generate(Map* map) = 0;
+	virtual void step(Map* map) = 0;
 	virtual void renderGUI(Game* game) = 0;
 	virtual GeneratorType getType() const = 0;
 };
@@ -39,7 +42,6 @@ private:
 
 private:
 	void noise(Map* map);
-	void step(Map* map);
 	bool basicEvaluation(int i, int j, const Map* map, const Map::CellArray& oldCells);
 	bool basicEvaluationClosed(int i, int j, const Map* map, const Map::CellArray& oldCells);
 	int countNeighbourhood(int i, int j, const Map* map, const Map::CellArray& oldCells, int distance, bool countSelf);
@@ -57,4 +59,39 @@ public:
 	void renderGUI(Game* game) override;
 	void start(Map* map) override;
 	void generate(Map* map) override;
+	void step(Map* map) override;
+
+};
+
+//----------- DRUNKARD WALK ----------------//
+struct DrunkardWalkConfig
+{
+	float expectedRatio = 0.55f;
+};
+
+class DrunkardWalkGenerator : public IGenerator
+{
+private:
+	DrunkardWalkConfig config;
+	int row;
+	int col;
+
+	std::random_device r;
+	std::default_random_engine engine;
+
+public:
+	DrunkardWalkGenerator();
+	~DrunkardWalkGenerator() {}
+
+	GeneratorType getType() const override
+	{
+		return GeneratorType::DrunkardWalk;
+	}
+
+	void init(const DrunkardWalkConfig& _config);
+
+	void renderGUI(Game* game) override;
+	void start(Map* map) override;
+	void generate(Map* map) override;
+	void step(Map* map) override;
 };

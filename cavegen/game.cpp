@@ -18,15 +18,16 @@ bool Game::init(const WindowConfig& _windowConfig, const MapConfig& _mapConfig, 
 	mapConfig = _mapConfig;
 	simulationConfig = _simulationConfig;
 
+	simulationConfig.generatorIdx = 0;
+	CellAutomataConfig config;
+	generator = new CellAutomataGenerator();
+	((CellAutomataGenerator*)generator)->init(config);
+
 	window = new sf::RenderWindow(sf::VideoMode(windowConfig.width, windowConfig.height), windowConfig.title, windowConfig.fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
 	window->setVerticalSyncEnabled(true);
 
 	map = new Map();
 	map->init(mapConfig.size[MAP_ROWS_IDX], mapConfig.size[MAP_COLS_IDX], CellType::Wall);
-
-	CellAutomataConfig config;
-	generator = new CellAutomataGenerator();
-	((CellAutomataGenerator*)generator)->init(config);
 
 
 	ImGui::SFML::Init(*window);
@@ -46,43 +47,113 @@ int Game::getMaxCols() const
 
 void Game::drawGUI()
 {
-	ImGui::Begin("Map starting params"); // begin window
-										 // Background color edit
-	ImGui::InputInt2("Rows, cols", mapConfig.size);
-	// Clamp values
-	mapConfig.size[MAP_ROWS_IDX] = std::min(mapConfig.size[MAP_ROWS_IDX], getMaxRows());
-	mapConfig.size[MAP_COLS_IDX] = std::min(mapConfig.size[MAP_COLS_IDX], getMaxCols());
-
-	if (ImGui::Button("Clear map"))
+	char buf[128];
+	if (!playing)
 	{
-		map->init(mapConfig.size[MAP_ROWS_IDX], mapConfig.size[MAP_COLS_IDX], CellType::Wall);
+		snprintf(buf, 128, "Config generator###window");
 	}
-
-	if (generator != nullptr)
+	else
 	{
-		generator->renderGUI(this);
+		snprintf(buf, 128, "Iter %d/%d###window", (simulationConfig.numIters - itersLeft), simulationConfig.numIters);
 	}
+	ImGui::Begin(buf); // begin window
 
-	// TODO: Simulation window
-	ImGui::Checkbox("Auto-step?", &simulationConfig.autoStep);
-	ImGui::InputInt("Iteration #", &simulationConfig.numIters);
-	ImGui::InputFloat("Step delay", &simulationConfig.stepDelay);
-
-
-	if (ImGui::Button("Start generation"))
+	char generatorName[64];
+	if (generator == nullptr)
 	{
-		generator->start(map);
+		snprintf(generatorName, 64, "NONE");
+	}
+	else if (generator->getType() == GeneratorType::CellAutomata)
+	{
+		snprintf(generatorName, 64, "CELL AUTOMATA");
+	}
+	else
+	{
+		snprintf(generatorName, 64, "DRUNKARD WALK");
+	}
+	ImGui::LabelText("Current generator: ", generatorName);
+	
+	if (!playing)
+	{
+		// Background color edit
+		ImGui::InputInt2("Rows, cols", mapConfig.size);
+		// Clamp values
+		mapConfig.size[MAP_ROWS_IDX] = std::min(mapConfig.size[MAP_ROWS_IDX], getMaxRows());
+		mapConfig.size[MAP_COLS_IDX] = std::min(mapConfig.size[MAP_COLS_IDX], getMaxCols());
+
+		if (ImGui::Button("Clear map"))
+		{
+			map->init(mapConfig.size[MAP_ROWS_IDX], mapConfig.size[MAP_COLS_IDX], CellType::Wall);
+		}
+
+		const char* items[] = { "Cell automata", "Drunkard Walk" };
+		if (ImGui::Combo("Generator type", &simulationConfig.generatorIdx, items, 2))
+		{
+			GeneratorType nextType = static_cast<GeneratorType>(simulationConfig.generatorIdx);
+			if (generator == nullptr || generator->getType() != nextType)
+			{
+				delete generator;
+				generator = nullptr;
+				if (nextType == GeneratorType::CellAutomata)
+				{
+					CellAutomataConfig config;
+					generator = new CellAutomataGenerator();
+					((CellAutomataGenerator*)generator)->init(config);
+				}
+				else
+				{
+					DrunkardWalkConfig config;
+					generator = new DrunkardWalkGenerator();
+					((DrunkardWalkGenerator*)generator)->init(config);
+				}
+			}
+		}
+
+		if (generator != nullptr)
+		{
+			generator->renderGUI(this);
+		}
+
+		// TODO: Simulation window
+		ImGui::Checkbox("Auto-step?", &simulationConfig.autoStep);
+		ImGui::InputInt("Iteration #", &simulationConfig.numIters);
+		ImGui::InputFloat("Step delay", &simulationConfig.stepDelay);
+
+
+		bool isAutomataGenerator = generator->getType() == GeneratorType::CellAutomata;
+		char startLabel[32];
 		if (simulationConfig.autoStep)
 		{
-			playing = true;
-			itersLeft = simulationConfig.numIters;
-			nextIterTime = simulationConfig.stepDelay;
-			ImGui::SetWindowCollapsed(true);
-		}		
+			snprintf(startLabel, 32, "Play!");
+		}
+		else
+		{
+			snprintf(startLabel, 32, "Init generation");
+		}
+		if (ImGui::Button(startLabel))
+		{
+			generator->start(map);
+			if (simulationConfig.autoStep)
+			{
+				playing = true;
+				itersLeft = simulationConfig.numIters;
+				nextIterTime = simulationConfig.stepDelay;
+				ImGui::SetWindowCollapsed(true);
+			}
+		}
+		if (!simulationConfig.autoStep && ImGui::Button("Generate!"))
+		{
+			generator->generate(map);
+		}
 	}
-	if (!simulationConfig.autoStep && ImGui::Button("Simulation step"))
+	else
 	{
-		generator->generate(map);
+		if (ImGui::Button("Stop"))
+		{
+			playing = false;
+			nextIterTime = 0;
+			itersLeft = 0;
+		}
 	}
 	ImGui::End(); // end window
 	ImGui::Render();
@@ -121,7 +192,7 @@ void Game::update(float deltaTime)
 	nextIterTime -= deltaTime;
 	if (nextIterTime <= 0.f)
 	{
-		generator->generate(map);
+		generator->step(map);
 		itersLeft--;
 
 		if (itersLeft == 0)
@@ -161,6 +232,12 @@ void Game::cleanup()
 	{
 		delete map;
 		map = nullptr;
+	}
+
+	if (generator)
+	{
+		delete generator;
+		generator = nullptr;
 	}
 }
 

@@ -19,6 +19,7 @@ struct SimulationConfig
 	bool autoStep = false;
 	float stepDelay = 0.2f;
 	int numIters = 5;
+	int generatorIdx = 0;
 };
 
 struct WindowConfig
