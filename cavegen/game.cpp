@@ -264,15 +264,34 @@ void Game::drawMap()
 	sf::RectangleShape wallShape({ cellWidth, cellHeight });
 	wallShape.setFillColor(COLOR_WALL);
 
-	sf::RectangleShape shape;
+	sf::RectangleShape hallShape({ cellWidth, cellHeight });
+	hallShape.setFillColor(sf::Color::Red);
+
+	sf::RectangleShape* shape = nullptr;
 	for (int y = 0; y < map->rows; ++y)
 	{
 		for (int x = 0; x < map->cols; ++x)
 		{
-			sf::Shape* shape = ((*map)(y, x) == CellType::Empty) ? &emptyShape : &wallShape;
+			CellType curCell = (*map)(y, x);
+			shape = nullptr;
+			switch (curCell)
+			{
+			case CellType::Empty:
+			{
+				shape = &emptyShape; break;
+			}
+			case CellType::Wall:
+			{
+				shape = &wallShape; break;
+			}
+			case CellType::Corridor:
+			{
+				shape = &hallShape; break;
+			}
+			}
 			if (shape != nullptr)
 			{
-				shape->setPosition({ x *  cellWidth, y *  cellHeight });
+				shape->setPosition({ x *  cellWidth, y *  cellHeight });				
 				window->draw(*shape);
 			}
 		}

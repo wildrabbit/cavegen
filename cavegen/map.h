@@ -6,8 +6,9 @@
 
 enum class CellType : int
 {
-	Empty,
-	Wall
+	Empty = 0,
+	Wall,
+	Corridor
 };
 
 struct Map

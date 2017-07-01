@@ -103,15 +103,18 @@ struct BSPConfig
 {
 	int maxDivisions = -1;
 
-	float splitRatio = 0.25f;
+	float splitHRatio = 0.3f;
+	float splitVRatio = 0.5f;
 
-	float horizSplitProbability = 0.45f;
-	float emptyRoomProbability = 0.05f;
-	int minWidth = 15;
-	int maxWidth = 40;
+	float horizSplitProbability = 0.5f;
+	float emptyRoomProbability = 0.04f;
+	int minWidth = 40;
+	int minRoomWidth = 18;
+	int maxRoomWidth = minWidth - 2;
 
-	int minHeight = 15;
-	int maxHeight = 40;
+	int minHeight = 40;
+	int minRoomHeight = 20;
+	int maxRoomHeight = minHeight - 2;
 };
 
 struct BSPRect
@@ -120,6 +123,14 @@ struct BSPRect
 	int y = 0;
 	int w = 0;
 	int h = 0;
+
+	void set(int _x, int _y, int _w, int _h)
+	{
+		x = _x;
+		y = _y;
+		w = _w;
+		h = _h;
+	}
 };
 
 struct BSPTree
@@ -137,6 +148,7 @@ struct BSPTree
 	~BSPTree();
 	
 	void getLeaves(std::vector<BSPTree*>& leaves);
+	BSPTree* getRoom();
 	bool split();
 };
 
