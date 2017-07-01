@@ -67,9 +67,13 @@ void Game::drawGUI()
 	{
 		snprintf(generatorName, 64, "CELL AUTOMATA");
 	}
-	else
+	else if (generator->getType() == GeneratorType::DrunkardWalk)
 	{
 		snprintf(generatorName, 64, "DRUNKARD WALK");
+	}
+	else if (generator->getType() == GeneratorType::BSP)
+	{
+		snprintf(generatorName, 64, "BSP");
 	}
 	ImGui::LabelText("Current generator: ", generatorName);
 	
@@ -86,8 +90,8 @@ void Game::drawGUI()
 			map->init(mapConfig.size[MAP_ROWS_IDX], mapConfig.size[MAP_COLS_IDX], CellType::Wall);
 		}
 
-		const char* items[] = { "Cell automata", "Drunkard Walk" };
-		if (ImGui::Combo("Generator type", &simulationConfig.generatorIdx, items, 2))
+		const char* items[] = { "Cell automata", "Drunkard Walk", "BSP" };
+		if (ImGui::Combo("Generator type", &simulationConfig.generatorIdx, items, 3))
 		{
 			GeneratorType nextType = static_cast<GeneratorType>(simulationConfig.generatorIdx);
 			if (generator == nullptr || generator->getType() != nextType)
@@ -100,11 +104,17 @@ void Game::drawGUI()
 					generator = new CellAutomataGenerator();
 					((CellAutomataGenerator*)generator)->init(config);
 				}
-				else
+				else if (nextType == GeneratorType::DrunkardWalk)
 				{
 					DrunkardWalkConfig config;
 					generator = new DrunkardWalkGenerator();
 					((DrunkardWalkGenerator*)generator)->init(config);
+				}
+				else
+				{
+					BSPConfig config;
+					generator = new BSPGenerator();
+					((BSPGenerator*)generator)->init(config);
 				}
 			}
 		}
@@ -171,7 +181,7 @@ void Game::run()
 			ImGui::SFML::ProcessEvent(evt);
 			if (evt.type == sf::Event::Closed || evt.type == sf::Event::KeyReleased && evt.key.code == sf::Keyboard::Key::Escape)
 			{
-				window->close();
+				return;
 			}
 		}
 		sf::Time elapsed = deltaClock.restart();

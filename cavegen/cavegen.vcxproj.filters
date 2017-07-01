@@ -25,6 +25,12 @@
     <Filter Include="Header Files\ImGui\SFML">
       <UniqueIdentifier>{261ee8ab-26db-4dce-a097-e9f7f99cdf78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\generators">
+      <UniqueIdentifier>{39c2b03f-a4dc-46f3-97ce-4f0e7b8f95a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generators">
+      <UniqueIdentifier>{4b71809a-6eb2-4955-a039-6a30a988f259}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

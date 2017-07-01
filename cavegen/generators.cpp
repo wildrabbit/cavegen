@@ -2,6 +2,9 @@
 #include "game.h"
 #include "imgui.h"
 #include "imgui-sfml/imgui-sfml.h"
+#include <algorithm>
+
+#include <iostream>
 
 #define ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
 
@@ -113,8 +116,8 @@ int CellAutomataGenerator::countNeighbourhood(int i, int j, const Map* map, cons
 	return numWalls;
 }
 
-
 //----------------------------
+
 DrunkardWalkGenerator::DrunkardWalkGenerator()
 :r()
 ,engine(r())
@@ -176,4 +179,192 @@ void DrunkardWalkGenerator::generate(Map* map)
 		countFloor = std::count(map->cells.begin(), map->cells.end(), CellType::Empty);
 		ratio = countFloor / (float)map->numCells();
 	}
+}
+
+//----------------------------
+
+BSPTree::BSPTree()
+	:left(nullptr)
+	,right(nullptr)
+	,area({ 0,0,0,0 })
+{
+
+}
+
+BSPTree::~BSPTree()
+{
+	if (left) delete left;
+	if (right) delete right;
+	if (room) delete room;
+	left = right = nullptr;
+	room = nullptr;
+}
+
+void BSPTree::getLeaves(std::vector<BSPTree*>& leaves)
+{
+	if (right == nullptr && left == nullptr)
+	{
+		leaves.emplace_back(this);
+	}
+	else
+	{
+		left->getLeaves(leaves);
+		right->getLeaves(leaves);
+	}
+}
+
+bool BSPTree::split()
+{
+	int splitValue;
+
+	std::uniform_real_distribution<float> realDist(0.f, 1.f);
+	bool isHSplit = realDist(*splitEngine) < config->horizSplitProbability;
+	float ratio = area.w / (float)area.h;
+	if (ratio >= (1.f + config->splitRatio))
+	{
+		isHSplit = false;
+	}
+	else if ((area.h / (float)area.w) > 1.f + config->splitRatio)
+	{
+		isHSplit = true;
+	}
+
+	int maxSize = 0;
+	int minSize = 0;
+	if (isHSplit)
+	{
+		maxSize = area.h - config->minHeight;
+		minSize = config->minHeight;
+	}
+	else
+	{
+		maxSize = area.w - config->minWidth;
+		minSize = config->minWidth;
+	}
+	if (maxSize <= minSize)
+	{
+		return false;
+	}
+
+	std::uniform_int_distribution<int> splitDist(minSize, maxSize);
+	splitValue = splitDist(*splitEngine);
+		
+	left = new BSPTree();
+	right = new BSPTree();
+	left->splitEngine = right->splitEngine = splitEngine;
+	left->config = right->config = config;
+	if (isHSplit)
+	{
+		left->area = {area.x, area.y, area.w, splitValue};
+		right->area = { area.x, area.y + splitValue, area.w, area.h - splitValue };
+	}
+	else
+	{
+		left->area = {area.x, area.y, splitValue, area.h};
+		right->area = { area.x + splitValue, area.y, area.w - splitValue, area.h };
+	}
+	left->split();
+	right->split();
+	return true;
+}
+
+BSPGenerator::BSPGenerator()
+{
+}
+
+BSPGenerator::~BSPGenerator()
+{
+	if (generatedTree) { delete generatedTree; generatedTree = nullptr; }
+}
+void BSPGenerator::init(const BSPConfig& _config)
+{
+	config = _config;
+	splitEngine.seed(r());
+}
+void BSPGenerator::renderGUI(Game* game)
+{
+	
+}
+void BSPGenerator::start(Map* map)
+{
+	for (int i = 0; i < map->rows; ++i)
+	{
+		for (int j = 0; j < map->cols; ++j)
+		{
+			(*map)(i, j) = CellType::Wall;
+		}
+	}
+
+	std::uniform_int_distribution<int> rowDist(config.minHeight, config.maxHeight);
+	std::uniform_int_distribution<int> colDist(config.minWidth, config.maxWidth);
+
+
+	generatedTree = new BSPTree();
+	generatedTree->left = generatedTree->right = nullptr;
+	generatedTree->area = { 0, 0, map->cols, map->rows };
+	
+	generatedTree->splitEngine = &splitEngine;
+	generatedTree->config = &config;
+}
+
+void BSPGenerator::step(Map* map)
+{
+}
+void BSPGenerator::generate(Map* map)
+{
+	std::vector<BSPTree*> leaves;
+	generatedTree->getLeaves(leaves);
+	
+	std::uniform_real_distribution<float> skipDist(0.f, 1.f);
+	std::uniform_int_distribution<int> wDist(config.minWidth, config.maxWidth);
+	
+
+	// 1: split map
+	generatedTree->split();
+	/*do
+	{
+		splits = 0;
+		for (BSPTree* leaf: leaves)
+		{
+			if (leaf->split())
+			{
+				splits++;
+			}
+		}
+	} while (splits != 0);*/
+
+	// 2: populate
+	generatedTree->getLeaves(leaves);
+	for (BSPTree* leaf : leaves)
+	{
+		bool willSkip = skipDist(splitEngine) < config.horizSplitProbability;
+		//if (willSkip) continue;
+
+		std::uniform_int_distribution<int> roomDist(config.minHeight, std::min(config.maxHeight, leaf->area.h));
+		int h = roomDist(splitEngine);
+		roomDist = std::uniform_int_distribution<int>(config.minWidth, std::min(config.maxWidth, leaf->area.w));
+		int w = roomDist(splitEngine);
+
+		roomDist = std::uniform_int_distribution<int>(0, leaf->area.x + leaf->area.w - w);
+		int x = leaf->area.x + roomDist(splitEngine);
+
+		roomDist = std::uniform_int_distribution<int>(0, leaf->area.y + leaf->area.h - h);
+		int y = leaf->area.y + roomDist(splitEngine);
+		leaf->room = new BSPRect();
+		leaf->room->x = x;
+		leaf->room->y = y; 
+		leaf->room->w = w; 
+		leaf->room->h = h;
+
+		for (int posY = y; posY <= y + h; ++posY)
+		{
+			for (int posX = x; posX <= x + w; ++posX)
+			{
+				(*map)(posY, posX) = CellType::Empty;
+			}
+		}
+	}
+	
+	// 3: connect
+
 }

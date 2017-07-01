@@ -7,7 +7,9 @@ class Game;
 enum class GeneratorType : int
 {
 	CellAutomata = 0,
-	DrunkardWalk = 1
+	DrunkardWalk = 1,
+	BSP = 2,
+	AgentWalk = 3
 };
 
 class IGenerator
@@ -95,3 +97,71 @@ public:
 	void generate(Map* map) override;
 	void step(Map* map) override;
 };
+
+//----------- BSP ----------------//
+struct BSPConfig
+{
+	int maxDivisions = -1;
+
+	float splitRatio = 0.25f;
+
+	float horizSplitProbability = 0.45f;
+	float emptyRoomProbability = 0.05f;
+	int minWidth = 15;
+	int maxWidth = 40;
+
+	int minHeight = 15;
+	int maxHeight = 40;
+};
+
+struct BSPRect
+{
+	int x = 0;
+	int y = 0;
+	int w = 0;
+	int h = 0;
+};
+
+struct BSPTree
+{
+	BSPRect area;
+	BSPRect* room = nullptr;
+	BSPTree* right = nullptr;
+	BSPTree* left = nullptr;
+
+	BSPConfig* config;
+
+	std::default_random_engine* splitEngine;
+	
+	BSPTree();
+	~BSPTree();
+	
+	void getLeaves(std::vector<BSPTree*>& leaves);
+	bool split();
+};
+
+class BSPGenerator : public IGenerator
+{
+private:
+	BSPConfig config;
+	BSPTree* generatedTree;
+
+	std::random_device r;
+	std::default_random_engine splitEngine;
+public:
+	BSPGenerator();
+	~BSPGenerator();
+
+	GeneratorType getType() const override
+	{
+		return GeneratorType::BSP;
+	}
+
+	void init(const BSPConfig& _config);
+	void renderGUI(Game* game) override;
+	void start(Map* map) override;
+	void generate(Map* map) override;
+	void step(Map* map) override;
+};
+
+//----------- AGENT ----------------//
