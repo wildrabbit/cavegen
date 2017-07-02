@@ -54,8 +54,14 @@
     <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="generators.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="generators\bspRoomsGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
+    </ClCompile>
+    <ClCompile Include="generators\drunkardWalkGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
+    </ClCompile>
+    <ClCompile Include="generators\cellAutomataGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +94,15 @@
     </ClInclude>
     <ClInclude Include="generators.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\cellAutomataGenerator.h">
+      <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\drunkardWalkGenerator.h">
+      <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\bspRoomsGenerator.h">
+      <Filter>Header Files\generators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

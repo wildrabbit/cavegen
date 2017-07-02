@@ -129,7 +129,9 @@
     <ClCompile Include="..\..\..\development\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\development\imgui\imgui_draw.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="generators.cpp" />
+    <ClCompile Include="generators\bspRoomsGenerator.cpp" />
+    <ClCompile Include="generators\cellAutomataGenerator.cpp" />
+    <ClCompile Include="generators\drunkardWalkGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
   </ItemGroup>
@@ -143,6 +145,9 @@
     <ClInclude Include="..\..\..\development\imgui\stb_truetype.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="generators.h" />
+    <ClInclude Include="generators\bspRoomsGenerator.h" />
+    <ClInclude Include="generators\cellAutomataGenerator.h" />
+    <ClInclude Include="generators\drunkardWalkGenerator.h" />
     <ClInclude Include="map.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,10 +1,13 @@
 #include "game.h"
 
-#include "map.h"
-#include "generators.h"
 #include <SFML/Graphics.hpp>
 #include "imgui.h"
 #include "imgui-sfml/imgui-sfml.h"
+
+
+#include "generators/bspRoomsGenerator.h"
+#include "generators/cellAutomataGenerator.h"
+#include "generators/drunkardWalkGenerator.h"
 
 static const int MAP_ROWS_IDX = 0;
 static const int MAP_COLS_IDX = 1;
