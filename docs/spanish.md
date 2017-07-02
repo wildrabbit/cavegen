@@ -15,21 +15,24 @@ En esta demo puede verse el funcionamiento de algunos algoritmos básicos de gen
 
 [![Cell-automata example](https://img.youtube.com/vi/olJeZIYZtp8/0.jpg)](https://www.youtube.com/watch?v=olJeZIYZtp8)
 
-* El primero de ellos utiliza autómatas celulares. Como resultado, produce mapas relativamente naturales, como sistemas de cavernas. 
+El primero de ellos utiliza autómatas celulares. Como resultado, produce mapas relativamente naturales, como sistemas de cavernas. 
+
 [Referencia](https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/)
 
 #### Caminata del borracho
 
 [![Drunkard-walk example](https://img.youtube.com/vi/9tIFzq-guG0/0.jpg)](https://www.youtube.com/watch?v=9tIFzq-guG0)
 
-* "Paseo del borracho" (Drunkard walk). Genera también entornos más o menos orgánicos, pero bastante irregulares. Por accidente apliqué a continuación el primer algoritmo, generando niveles más suaves.
-
-#### Árboles BSP
+"Paseo del borracho" (Drunkard walk). Genera también entornos más o menos orgánicos, pero bastante irregulares. Por accidente apliqué a continuación el primer algoritmo, generando niveles más suaves.
 
 [![Drunkard-cell example](https://img.youtube.com/vi/Jba5-RIkkJw/0.jpg)](https://www.youtube.com/watch?v=Jba5-RIkkJw)
 
-* Árboles BSP. Útiles para generar mazmorras basadas en salas rectangulares generando una distribución regular del espacio.
+#### Árboles BSP
+
 [![BSP example](https://img.youtube.com/vi/FI07QY25OwE/0.jpg)](https://www.youtube.com/watch?v=FI07QY25OwE)
+
+Árboles BSP. Útiles para generar mazmorras basadas en salas rectangulares generando una distribución regular del espacio.
+
 
 Me habría gustado probar muchos otros, o combinarlos, pero mi disponibilidad estaba un poco limitada. Asimismo, la mejor prueba es utilizar los mapas generados en un juego real.
 
