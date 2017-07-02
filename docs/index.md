@@ -27,13 +27,13 @@ Dependencies:
 * [ImGUI-SFML bindings by Elias Daler](https://github.com/eliasdaler/imgui-sfml)
 
 
-### [Descargar demo](https://www.dropbox.com/s/wq5vp4t00aleis6/cavegen.zip?dl=0)
+### [Download demo](https://www.dropbox.com/s/wq5vp4t00aleis6/cavegen.zip?dl=0)
 
-Probado en un PC con Windows 10 64b.
+Tested on a PC with Windows 10 64b
 
-Requisitos:
+Requirements:
 
-* Probablemente las [librerías redistribuibles de VS2017](https://go.microsoft.com/fwlink/?LinkId=746571)
+* Probably the [redistributable package for VS2017](https://go.microsoft.com/fwlink/?LinkId=746571)
 
 
 * * *
