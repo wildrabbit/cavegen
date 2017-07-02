@@ -48,12 +48,35 @@ int Game::getMaxCols() const
 	return windowConfig.width / mapConfig.cellSize[CELL_WIDTH_IDX];
 }
 
+std::string getGeneratorName(IGenerator* generator)
+{
+	if (generator == nullptr) return "NONE";
+	switch (generator->getType())
+	{
+		case GeneratorType::BSP:
+		{
+			return "BSP";
+		}
+		case GeneratorType::CellAutomata:
+		{
+			return "CELL AUTOMATA";
+		}
+		case GeneratorType::DrunkardWalk:
+		{
+			return "DRUNKARD WALK";
+		}
+	}
+	return "NONE";
+}
+
 void Game::drawGUI()
 {
+	std::string name = getGeneratorName(generator);
+	
 	char buf[128];
 	if (!playing)
 	{
-		snprintf(buf, 128, "Config generator###window");
+		snprintf(buf, 128, "Config generator: %s ###window", name.c_str());
 	}
 	else
 	{
@@ -62,37 +85,25 @@ void Game::drawGUI()
 	ImGui::Begin(buf); // begin window
 
 	char generatorName[64];
-	if (generator == nullptr)
-	{
-		snprintf(generatorName, 64, "NONE");
-	}
-	else if (generator->getType() == GeneratorType::CellAutomata)
-	{
-		snprintf(generatorName, 64, "CELL AUTOMATA");
-	}
-	else if (generator->getType() == GeneratorType::DrunkardWalk)
-	{
-		snprintf(generatorName, 64, "DRUNKARD WALK");
-	}
-	else if (generator->getType() == GeneratorType::BSP)
-	{
-		snprintf(generatorName, 64, "BSP");
-	}
-	ImGui::LabelText("Current generator: ", generatorName);
+	snprintf(generatorName, 64, "Current generator: %s", name.c_str());
+	ImGui::LabelText("", generatorName);
 	
 	if (!playing)
 	{
+		ImGui::LabelText("", "Map data");
 		// Background color edit
 		ImGui::InputInt2("Rows, cols", mapConfig.size);
 		// Clamp values
 		mapConfig.size[MAP_ROWS_IDX] = std::min(mapConfig.size[MAP_ROWS_IDX], getMaxRows());
 		mapConfig.size[MAP_COLS_IDX] = std::min(mapConfig.size[MAP_COLS_IDX], getMaxCols());
 
-		if (ImGui::Button("Clear map"))
+		if (ImGui::Button("Reset map size"))
 		{
 			map->init(mapConfig.size[MAP_ROWS_IDX], mapConfig.size[MAP_COLS_IDX], CellType::Wall);
 		}
+		ImGui::Separator();
 
+		ImGui::LabelText("", "Generator data");
 		const char* items[] = { "Cell automata", "Drunkard Walk", "BSP" };
 		if (ImGui::Combo("Generator type", &simulationConfig.generatorIdx, items, 3))
 		{
@@ -103,12 +114,14 @@ void Game::drawGUI()
 				generator = nullptr;
 				if (nextType == GeneratorType::CellAutomata)
 				{
+					simulationConfig.numIters = 10;
 					CellAutomataConfig config;
 					generator = new CellAutomataGenerator();
 					((CellAutomataGenerator*)generator)->init(config);
 				}
 				else if (nextType == GeneratorType::DrunkardWalk)
 				{
+					simulationConfig.numIters = 10000;
 					DrunkardWalkConfig config;
 					generator = new DrunkardWalkGenerator();
 					((DrunkardWalkGenerator*)generator)->init(config);
@@ -126,11 +139,11 @@ void Game::drawGUI()
 		{
 			generator->renderGUI(this);
 		}
-
-		// TODO: Simulation window
+		ImGui::Separator();
 		bool isBSP = generator->getType() == GeneratorType::BSP;
 		if (!isBSP)
 		{
+			ImGui::LabelText("", "Simulation data");
 			ImGui::Checkbox("Auto-step?", &simulationConfig.autoStep);
 			ImGui::InputInt("Iteration #", &simulationConfig.numIters);
 			ImGui::InputFloat("Step delay", &simulationConfig.stepDelay);
@@ -173,6 +186,10 @@ void Game::drawGUI()
 	}
 	else
 	{
+		if (generator->getType() == GeneratorType::DrunkardWalk)
+		{
+			((DrunkardWalkGenerator*)generator)->renderInfoGUI(this);
+		}
 		if (ImGui::Button("Stop"))
 		{
 			playing = false;
@@ -220,7 +237,9 @@ void Game::update(float deltaTime)
 		generator->step(map);
 		itersLeft--;
 
-		if (itersLeft == 0)
+		DrunkardWalkGenerator* drunkardGen = dynamic_cast<DrunkardWalkGenerator*>(generator);
+
+		if (itersLeft == 0 || (drunkardGen != nullptr && drunkardGen->stopWhenRatioIsMet && drunkardGen->filledRatio(map)))
 		{
 			nextIterTime = 0.f;
 			playing = false;
@@ -267,8 +286,8 @@ void Game::cleanup()
 
 void Game::drawMap()
 {
-	const sf::Color COLOR_EMPTY(0x1A, 0x1E, 0x1B);
-	const sf::Color COLOR_WALL(0x20, 0x42, 0x26);
+	const sf::Color COLOR_EMPTY(0xA, 0xf, 0xd);
+	const sf::Color COLOR_WALL(0xc4, 0xcb, 0xca);
 
 	float cellWidth = (float)mapConfig.cellSize[CELL_WIDTH_IDX];
 	float cellHeight = (float)mapConfig.cellSize[CELL_HEIGHT_IDX];
