@@ -16,5 +16,7 @@ There were many others I would have liked to try, but my availability was somewh
 
 [COMING SOON - Download]()
 
-[Back to my Github pages index] (http://wildrabbit.github.io)
+* * *
+
+[Back to my Github pages index](http://wildrabbit.github.io)
 [Back to my portfolio](http://stealthcoder.tumblr.com)

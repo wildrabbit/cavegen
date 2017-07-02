@@ -19,5 +19,8 @@ Me habría gustado probar muchos otros, o combinarlos, pero mi disponibilidad es
 
 [En construcción - Descargar demo]()
 
-[Volver a la página principal] (http://wildrabbit.github.io)
+* * *
+
+[Volver a la página principal](http://wildrabbit.github.io)
+
 [Volver a mi portfolio](http://stealthcoder.tumblr.com)
