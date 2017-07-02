@@ -12,9 +12,29 @@ This demo features some basic procedural map generation algorithms:
 
 There were many others I would have liked to try, but my availability was somewhat limited. Also, the real stress test
 
-[View source](https://github.com/wildrabbit/cavegen)
+## Downloads 
 
-[COMING SOON - Download]()
+### [Source code](https://github.com/wildrabbit/cavegen)
+
+Dependencies:
+
+* VS2017 platform toolset(v141) (it could work on VS2015, but I haven't tested it)
+
+* [SFML SDK 2.4](https://www.sfml-dev.org/download/sfml/2.4.2)
+
+* [ImGUI](https://github.com/ocornut/imgui)
+
+* [ImGUI-SFML bindings by Elias Daler](https://github.com/eliasdaler/imgui-sfml)
+
+
+### [Descargar demo](https://www.dropbox.com/s/wq5vp4t00aleis6/cavegen.zip?dl=0)
+
+Probado en un PC con Windows 10 64b.
+
+Requisitos:
+
+* Probablemente las [librerías redistribuibles de VS2017](https://go.microsoft.com/fwlink/?LinkId=746571)
+
 
 * * *
 

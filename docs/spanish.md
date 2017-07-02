@@ -15,9 +15,28 @@ En esta demo puede verse el funcionamiento de algunos algoritmos básicos de gen
 
 Me habría gustado probar muchos otros, o combinarlos, pero mi disponibilidad estaba un poco limitada. Asimismo, la mejor prueba es utilizar los mapas generados en un juego real.
 
-[Ver código fuente](https://github.com/wildrabbit/cavegen)
+## Descargas
 
-[En construcción - Descargar demo]()
+### [Código fuente](https://github.com/wildrabbit/cavegen)
+
+Dependencias:
+
+* Toolset VS 2017 (v141) (probablemente funcione con la v140 y VS 2015, pero no está probado)
+
+* [SFML SDK 2.4](https://www.sfml-dev.org/download/sfml/2.4.2)
+
+* [ImGUI](https://github.com/ocornut/imgui)
+
+* [Bindings de ImGUI con SFML por Elias Daler](https://github.com/eliasdaler/imgui-sfml)
+
+
+### [Descargar demo](https://www.dropbox.com/s/wq5vp4t00aleis6/cavegen.zip?dl=0)
+
+Probado en un PC con Windows 10 64b.
+
+Requisitos:
+
+* Probablemente las [librerías redistribuibles de VS2017](https://go.microsoft.com/fwlink/?LinkId=746571)
 
 * * *
 
