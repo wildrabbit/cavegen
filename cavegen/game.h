@@ -51,6 +51,7 @@ private:
 	int getMaxRows() const;
 	int getMaxCols() const;
 public:
+	
 	Map* getMap() 
 	{
 		return map;

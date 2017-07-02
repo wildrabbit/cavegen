@@ -1,5 +1,6 @@
 #include "bspRoomsGenerator.h"
-
+#include "imgui.h"
+#include <algorithm>
 //----------------------------
 
 BSPTree::BSPTree()
@@ -129,7 +130,36 @@ void BSPGenerator::init(const BSPConfig& _config)
 }
 void BSPGenerator::renderGUI(Game* game)
 {
+	float splitRatios[2] = { config.splitHRatio, config.splitVRatio };
+	if (ImGui::InputFloat2("Ratio differences(H,V) to split", splitRatios))
+	{
+		config.splitHRatio = splitRatios[0];
+		config.splitVRatio = splitRatios[1];
+	}
 
+	ImGui::InputFloat("Prob. to H-split", &config.horizSplitProbability);
+	ImGui::InputFloat("Prob. to leave area empty", &config.emptyRoomProbability);
+
+	int areaMinSize[2] = { config.minWidth, config.minHeight };
+	if (ImGui::InputInt2("Min. area size (C, R)", areaMinSize))
+	{
+		config.minWidth = areaMinSize[0];
+		config.minHeight = areaMinSize[1];
+	}
+
+	int roomMinSize[2] = { config.minRoomWidth, config.minRoomHeight };
+	if (ImGui::InputInt2("Min. room size (C, R)", roomMinSize))
+	{
+		config.minRoomWidth = std::max(2, roomMinSize[0]);
+		config.minRoomHeight = std::max(2,roomMinSize[1]);
+	}
+
+	int roomMaxSize[2] = { config.maxRoomWidth, config.maxRoomHeight };
+	if (ImGui::InputInt2("Max. room size (C, R)", roomMaxSize))
+	{
+		config.maxRoomWidth = roomMaxSize[0];
+		config.maxRoomHeight = roomMaxSize[1];
+	}
 }
 void BSPGenerator::start(Map* map)
 {
@@ -311,9 +341,9 @@ void BSPGenerator::generate(Map* map)
 		bool willSkip = skipDist(splitEngine) < config.emptyRoomProbability;
 		if (willSkip) continue;
 
-		std::uniform_int_distribution<int> roomDist(config.minRoomHeight, config.maxRoomHeight);
+		std::uniform_int_distribution<int> roomDist(config.minRoomHeight, std::min(leaf->area.h,config.maxRoomHeight));
 		int h = roomDist(splitEngine);
-		roomDist = std::uniform_int_distribution<int>(config.minRoomWidth, config.maxRoomWidth);
+		roomDist = std::uniform_int_distribution<int>(config.minRoomWidth, std::min(leaf->area.w, config.maxRoomWidth));
 		int w = roomDist(splitEngine);
 
 		roomDist = std::uniform_int_distribution<int>(1, leaf->area.w - w - 1);

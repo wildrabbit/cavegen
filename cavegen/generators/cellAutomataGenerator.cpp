@@ -1,6 +1,6 @@
 #include "cellAutomataGenerator.h"
 #include "imgui.h"
-#include "imgui-sfml/imgui-sfml.h"
+
 
 
 #define ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))

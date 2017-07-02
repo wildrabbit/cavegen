@@ -128,10 +128,18 @@ void Game::drawGUI()
 		}
 
 		// TODO: Simulation window
-		ImGui::Checkbox("Auto-step?", &simulationConfig.autoStep);
-		ImGui::InputInt("Iteration #", &simulationConfig.numIters);
-		ImGui::InputFloat("Step delay", &simulationConfig.stepDelay);
-
+		bool isBSP = generator->getType() == GeneratorType::BSP;
+		if (!isBSP)
+		{
+			ImGui::Checkbox("Auto-step?", &simulationConfig.autoStep);
+			ImGui::InputInt("Iteration #", &simulationConfig.numIters);
+			ImGui::InputFloat("Step delay", &simulationConfig.stepDelay);
+		}
+		else
+		{
+			simulationConfig.autoStep = false;
+		}
+		
 
 		bool isAutomataGenerator = generator->getType() == GeneratorType::CellAutomata;
 		char startLabel[32];
@@ -141,7 +149,7 @@ void Game::drawGUI()
 		}
 		else
 		{
-			snprintf(startLabel, 32, "Init generation");
+			snprintf(startLabel, 32, "Start generation");
 		}
 		if (ImGui::Button(startLabel))
 		{
@@ -153,8 +161,12 @@ void Game::drawGUI()
 				nextIterTime = simulationConfig.stepDelay;
 				ImGui::SetWindowCollapsed(true);
 			}
+			else
+			{
+				generator->generate(map);
+			}
 		}
-		if (!simulationConfig.autoStep && ImGui::Button("Generate!"))
+		if (!simulationConfig.autoStep && isAutomataGenerator && ImGui::Button("Next Step"))
 		{
 			generator->generate(map);
 		}
@@ -217,8 +229,7 @@ void Game::update(float deltaTime)
 		{
 			nextIterTime = simulationConfig.stepDelay;
 		}
-	}
-
+	}	
 }
 void Game::draw()
 {
