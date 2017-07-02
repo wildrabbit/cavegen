@@ -1,6 +1,6 @@
 ---
 layout: default
-title: FemDevs' - I reto de programación: Cavegen!
+title: Primer reto de programación FemDevs: Cavegen!
 ---
 
 [English version](index.md)

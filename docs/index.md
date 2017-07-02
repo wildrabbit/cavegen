@@ -19,4 +19,5 @@ There were many others I would have liked to try, but my availability was somewh
 * * *
 
 [Back to my Github pages index](http://wildrabbit.github.io)
+
 [Back to my portfolio](http://stealthcoder.tumblr.com)
