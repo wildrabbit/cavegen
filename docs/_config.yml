@@ -1,3 +1,4 @@
-theme: jekyll-theme-cayman
+theme: jekyll-theme-time-machine
 title: Cavegen!
 description: My entry for FemDevs' first programming challenge. The theme was Procedural map generation
+show-downloads: "false"
