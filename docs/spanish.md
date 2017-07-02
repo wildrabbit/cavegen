@@ -24,7 +24,7 @@ El primero de ellos utiliza autómatas celulares. Uno de los más sencillos es u
 
 // TODO: Insertar gráfico
 
-En nuestro caso contamos con dos tipos de cálculo.
+En este caso decidí probar con dos tipos de cálculo.
 * **Básico** - Una celda en un tiempo T será de tipo "pared" si el número de celdas vecinas en T-1 supera un umbral concreto.
 * **Extendido** - Una celda en tiempo T será de tipo "pared" si cumple el cálculo básico o hay una o menos celdas de tipo "pared" en un radio de dos celdas. Esto elimina los espacios abiertos del algoritmo básico, y genera niveles más laberínticos.
 
@@ -32,7 +32,8 @@ Podemos elegir si la celda en cuestión cuenta o no en el cómputo.
 
 Como resultado, produce mapas relativamente naturales, como sistemas de cavernas. 
 
-[Referencia](https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/)
+[Ref. 1 - Math ∩ Programming](https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/)
+[Ref. 2 - Roguebasin](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels/)
 
 #### Caminata del borracho
 
@@ -49,6 +50,8 @@ Este algoritmo genera también entornos más o menos orgánicos, pero son bastan
 Algunas pegas que le he encontrado son la probabilidad de atasco. Al moverse de uno en uno y no tener en cuenta ningún tipo de condición adicional, es posible que el agente se quede atascado intentando "cavar en el vacío". Quería haber implementado un cuarto generador basado también en varios agentes más especializados en funciones concretas y con tiempos de vida finitos, pero al final lo dejé para otro momento. 
 Asimismo, con mapas grandes (Después de unas pruebas preliminares al principio del reto con el generador basado en autómatas celulares pasé de un tamaño 40x30 a 200x150) puede concentrarse demasiado en un área concreta. Quizás con más de un agente se pueda mejorar el resultado.
 
+[Ref.1 - Roguebasin](http://www.roguebasin.com/index.php?title=Random_Walk_Cave_Generation)
+
 #### Árboles BSP
 
 [![BSP example](https://pasteboard.co/Gz8oGWP.png)](https://www.youtube.com/watch?v=FI07QY25OwE)
@@ -61,10 +64,17 @@ Cuando terminamos de dividir, generamos salas en cada una de las divisiones fina
 
 En función de los parámetros de ajuste (probabilidad de división horizontal vs vertical, tamaño de divisiones y de salas a generar dentro de una división, etc) este tipo de generador aprovecha bastante bien el espacio del mapa, y genera mapas relativamente regulares (a veces igual demasiado regulares).
 
+[Ref.1 - Tutsplus](https://gamedevelopment.tutsplus.com/tutorials/how-to-use-bsp-trees-to-generate-game-maps--gamedev-12268)
+
+[Ref.1 - Eskerda](https://eskerda.com/bsp-dungeon-generation/)
+
+#### Referencias adicionales
+
+EN CONSTRUCCIÓN -_-U
 
 ### Conclusiones
 
-Me habría gustado probar varios otros, alterarlos para conseguir otros resultados o combinarlos, pero mi disponibilidad estaba un poco limitada. Sin embargo, es un muy buen entrenamiento para 
+Me habría gustado probar varios otros, alterarlos para conseguir otros resultados o combinarlos, pero mi disponibilidad estaba un poco limitada. Sin embargo, es un muy buen entrenamiento.
 
 ## Descargas
 
