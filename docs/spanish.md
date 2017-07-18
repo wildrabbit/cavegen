@@ -15,9 +15,9 @@ Es un tema que siempre me ha interesado, y además podía resultarme útil en al
 
 Una vez implementado el primer algoritmo me di cuenta de que necesitaba alguna manera cómoda de trastear con los parámetros del generador, así que aproveché para probar ImGUI, una librería de interfaces de usuario en modo inmediato que ha ganado popularidad últimamente frente a soluciones tradicionales, como QT.
 
-### Algoritmos
+## Algoritmos
 
-#### Autómatas celulares
+### Autómatas celulares
 
 [![Cell-automata example](https://img.youtube.com/vi/olJeZIYZtp8/0.jpg)](https://www.youtube.com/watch?v=olJeZIYZtp8)
 
@@ -37,7 +37,7 @@ Como resultado, produce mapas relativamente naturales, lo que permite representa
 
 [Ref. 2 - Roguebasin](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels/)
 
-#### Caminata del borracho
+### Caminata del borracho
 
 [![Drunkard-walk example](https://img.youtube.com/vi/9tIFzq-guG0/0.jpg)](https://www.youtube.com/watch?v=9tIFzq-guG0)
 
@@ -57,7 +57,7 @@ Asimismo, con mapas grandes (Después de unas pruebas preliminares al principio 
 
 [Ref.1 - Roguebasin](http://www.roguebasin.com/index.php?title=Random_Walk_Cave_Generation)
 
-#### Árboles BSP
+### Árboles BSP
 
 [![BSP example](https://cdn.pbrd.co/images/Gz8oGWP.png)](https://www.youtube.com/watch?v=FI07QY25OwE)
 
@@ -73,7 +73,7 @@ En función de los parámetros de ajuste (probabilidad de división horizontal v
 
 [Ref.1 - Eskerda](https://eskerda.com/bsp-dungeon-generation/)
 
-### Conclusiones
+## Conclusiones
 
 Me habría gustado probar varios otros, alterarlos para conseguir otros resultados o combinarlos, pero mi disponibilidad estaba un poco limitada. Sin embargo, es un muy buen entrenamiento.
 
