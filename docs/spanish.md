@@ -7,12 +7,13 @@ title: Primer reto de programación FemDevs: Cavegen!
 
 ## Introducción
 
-Del 16 de junio al 2 de julio se ha organizado el primer reto de programación de FemDevs. En esencia, se elige una feature o tecnología utilizada en desarrollo de juegos y las participantes desarrollan una pequeña demo.
+Del 16 de junio al 2 de julio se ha organizado el primer reto de programación de FemDevs. En esencia, dada una mecánica o técnica utilizada en desarrollo de juegos, las participantes desarrollan una pequeña demo.
+
 Durante la semana previa se propusieron una serie de temas a votar, y el ganador fue "Generación de mapas procedurales". 
 
-Es un tema que siempre me ha interesado, y además podía resultarme útil en alguno de mis proyectos en eterno desarrollo (¡Te miro a ti, Rob-like!), así que me propuse participar con algunos algoritmos típicamente utilizados en Roguelikes.
+Es un tema que siempre me ha interesado, y además podía resultarme útil en alguno de mis proyectos en eterno desarrollo (¡Te miro a ti, [Rob-like](https://ithildin.itch.io/rob-like)!), así que me propuse participar con algunos algoritmos típicamente utilizados en Roguelikes.
 
-Una vez implementado el primer algoritmo me di cuenta de que necesitaba alguna manera cómoda de jugar con los parámetros del generador, así que aproveché para probar ImGUI, una librería de interfaces de usuario en modo inmediato que ha ganado popularidad últimamente.
+Una vez implementado el primer algoritmo me di cuenta de que necesitaba alguna manera cómoda de trastear con los parámetros del generador, así que aproveché para probar ImGUI, una librería de interfaces de usuario en modo inmediato que ha ganado popularidad últimamente frente a soluciones tradicionales, como QT.
 
 ### Algoritmos
 
@@ -20,19 +21,20 @@ Una vez implementado el primer algoritmo me di cuenta de que necesitaba alguna m
 
 [![Cell-automata example](https://img.youtube.com/vi/olJeZIYZtp8/0.jpg)](https://www.youtube.com/watch?v=olJeZIYZtp8)
 
-El primero de ellos utiliza autómatas celulares. Uno de los más sencillos es un autómata síncrono, que opera en pasos definidos. El estado en un tiempo determinado se calcula a partir del estado en el paso anterior.
+El primero de ellos utiliza autómatas celulares. Uno de los más sencillos es un autómata síncrono, que opera en pasos definidos. El estado del sistema en un instante determinado se calcula a partir del estado en el paso anterior.
 
-// TODO: Insertar gráfico
+![Maravilloso ejemplo de programmer art](http://i68.tinypic.com/fxxnvn.png)
 
-En este caso decidí probar con dos tipos de cálculo.
+En este caso decidí probar con dos variaciones a la regla que determina el tipo de salida de una celda.
 * **Básico** - Una celda en un tiempo T será de tipo "pared" si el número de celdas vecinas en T-1 supera un umbral concreto.
 * **Extendido** - Una celda en tiempo T será de tipo "pared" si cumple el cálculo básico o hay una o menos celdas de tipo "pared" en un radio de dos celdas. Esto elimina los espacios abiertos del algoritmo básico, y genera niveles más laberínticos.
 
 Podemos elegir si la celda en cuestión cuenta o no en el cómputo.
 
-Como resultado, produce mapas relativamente naturales, como sistemas de cavernas. 
+Como resultado, produce mapas relativamente naturales, lo que permite representar archipiélagos o sistemas de cavernas. 
 
 [Ref. 1 - Math ∩ Programming](https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/)
+
 [Ref. 2 - Roguebasin](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels/)
 
 #### Caminata del borracho
@@ -41,22 +43,25 @@ Como resultado, produce mapas relativamente naturales, como sistemas de cavernas
 
 El concepto de este algoritmo es bastante simple también. En cada turno un agente va desplazándose en una dirección al azar y excavando celdas vacías mientras no haya completado un porcentaje dado (o, si estamos visualizando paso a paso la simulación, un número de pasos).
 
-En mi código utilizo un solo agente que no existe como tal. Va implícito en la clase del generador como una serie de miembros de la misma (básicamente en la posición actual y el número de celdas excavadas).
+En mi código utilizo un solo agente que no existe como tal, sino que va implícito en la clase del generador como una serie de miembros de la misma (básicamente, la posición actual y el número de celdas excavadas).
 
-Este algoritmo genera también entornos más o menos orgánicos, pero son bastante irregulares. Por accidente apliqué a continuación un paso de generación del autómata celular, obteniendo como resultado niveles más suaves.
+Este algoritmo genera también entornos más o menos orgánicos, pero son bastante irregulares. Es bastante probable que esto se deba a que me pasé con la borrachera del agente, si me permitís la licencia, y forcé que en cada paso escogiera una nueva dirección. En otras implementaciones que he visto el agente preserva la dirección en la que excava durante un cierto número de pasos, antes de escoger una nueva, lo cual probablemente genere pasillos más definidos.
+
+Por accidente apliqué a continuación un paso de generación del autómata celular, obteniendo como resultado niveles más suaves.
 
 [![Drunkard-cell example](https://img.youtube.com/vi/Jba5-RIkkJw/0.jpg)](https://www.youtube.com/watch?v=Jba5-RIkkJw)
 
-Algunas pegas que le he encontrado son la probabilidad de atasco. Al moverse de uno en uno y no tener en cuenta ningún tipo de condición adicional, es posible que el agente se quede atascado intentando "cavar en el vacío". Quería haber implementado un cuarto generador basado también en varios agentes más especializados en funciones concretas y con tiempos de vida finitos, pero al final lo dejé para otro momento. 
-Asimismo, con mapas grandes (Después de unas pruebas preliminares al principio del reto con el generador basado en autómatas celulares pasé de un tamaño 40x30 a 200x150) puede concentrarse demasiado en un área concreta. Quizás con más de un agente se pueda mejorar el resultado.
+Algunas pegas que le he encontrado son la relativamente elevada probabilidad de atasco. Al moverse de uno en uno, como comentaba antes, y no tener en cuenta ningún tipo de condición adicional, es posible que el agente se quede atascado intentando excavar en celdas ya procesadas. Quería haber implementado un cuarto generador basado también en varios agentes más especializados en funciones concretas y con tiempos de vida finitos, pero al final lo dejé para otro momento. 
+
+Asimismo, con mapas grandes (Después de unas pruebas preliminares al principio del reto con el generador basado en autómatas celulares pasé de un tamaño 40x30 a 200x150) puede concentrarse demasiado en un área concreta, desaprovechando mucho espacio disponible. Quizás con más de un agente se pueda mejorar el resultado.
 
 [Ref.1 - Roguebasin](http://www.roguebasin.com/index.php?title=Random_Walk_Cave_Generation)
 
 #### Árboles BSP
 
-[![BSP example](https://pasteboard.co/Gz8oGWP.png)](https://www.youtube.com/watch?v=FI07QY25OwE)
+[![BSP example](https://cdn.pbrd.co/images/Gz8oGWP.png)](https://www.youtube.com/watch?v=FI07QY25OwE)
 
-La generación basada en árboles BSP se utiliza con frecuencia para generar mazmorras basadas en salas rectangulares. 
+La generación basada en árboles BSP se utiliza con frecuencia para generar mazmorras basadas en estancias regulares, típicamente rectangulares, comunicadas a través de corredores. 
 
 En primer lugar, vamos dividiendo en cada paso el mapa en dos. Las divisiones atienden a una serie de criterios, como el cociente ancho/alto (y viceversa), para garantizar que no tengamos niveles demasiado estrechos, o el tamaño mínimo de una sala.
 
@@ -68,13 +73,11 @@ En función de los parámetros de ajuste (probabilidad de división horizontal v
 
 [Ref.1 - Eskerda](https://eskerda.com/bsp-dungeon-generation/)
 
-#### Referencias adicionales
-
-EN CONSTRUCCIÓN -_-U
-
 ### Conclusiones
 
 Me habría gustado probar varios otros, alterarlos para conseguir otros resultados o combinarlos, pero mi disponibilidad estaba un poco limitada. Sin embargo, es un muy buen entrenamiento.
+
+Una vez damos el salto a aspectos de implementación más cercanos al diseño de un juego, entra al campo otro factor, que es la definición de puntos de interés o colocación de entidades. Recientemente vi un artículo de la [segunda edición de Game AI Pro](http://gameaipro.com) sobre resolutores de restricciones para dominios finitos que me pareció bastante relevante.
 
 ## Descargas
 
@@ -101,7 +104,10 @@ Requisitos:
 
 ### Instrucciones
 
-EN CONSTRUCCIÓN -_-U
+Una vez descomprimido el zip de la demo, es necesario hacer doble click para lanzarla.
+
+Si no hay problemas de compatibilidad o librerías, aparecerá la ventana principal con el menú de opciones desplegado. 
+
 
 * * *
 
